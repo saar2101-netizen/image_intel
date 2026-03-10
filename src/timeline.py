@@ -1,5 +1,3 @@
-from extractor import *
-
 def create_timeline(image_data: list) -> str:
     """
 
