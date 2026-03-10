@@ -1,5 +1,3 @@
-import pprint
-
 from PIL import Image
 from PIL.ExifTags import TAGS
 from pathlib import Path
