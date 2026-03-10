@@ -17,8 +17,9 @@ import folium
 
 
 
+
 def sort_by_time(arr:list[dict])-> list[dict]:
-     sorted_images = sorted(arr, key = lambda img: img["datetime"] )
+     sorted_images = sorted(arr, key = lambda img: img["datetime"] or "" )
 
      # path = [(img["latitude"], img["longitude"]) for img in sorted_images]
      # folium.Polyline(path).add_to(m)
@@ -27,7 +28,7 @@ def sort_by_time(arr:list[dict])-> list[dict]:
 
 
 def create_map(images_data:list[dict]) -> str: # Returns HTML string
-    gps_images = [img for img in images_data if img["has_gps"]]
+    gps_images = [img for img in images_data if img["has_gps"]and img["latitude"] is not None and img["longitude"] is not None]
 
     if not gps_images:
         return "<h2>No GPS data found</h2>"
@@ -76,8 +77,10 @@ if __name__ == "__main__":
          "datetime": "2025-01-13 09:00:00"},
     ]
 
-    sorted_data = sort_by_time(fake_data)
-    print(sorted_data)
+    sorted_data = sort_by_time(extract_all(folder_path='C:\\Users\\User\\Desktop\\saar\\image_intel\\images\\sample_data'))
+    # print(sorted_data) # To check how the sorted data looks like.
+
+    # sorted_data = sort_by_time(fake_data) For testing.
 
     html = create_map(sorted_data)
     with open("test_map.html", "w", encoding="utf-8") as f:
