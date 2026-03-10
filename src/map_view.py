@@ -12,25 +12,57 @@ map_view.py - יצירת מפה אינטראקטיבית
 5. תיקון color_index - היה מתקדם על כל תמונה במקום רק על מכשיר חדש
 6. הוספת מקרא מכשירים
 """
-
 import folium
 
 
-def sort_by_time(arr):
-    pass
 
 
-def create_map(images_data):
-    """
-    יוצר מפה אינטראקטיבית עם כל המיקומים.
 
-    Args:
-        images_data: רשימת מילונים מ-extract_all
+def sort_by_time(arr:list[dict])-> list[dict]:
+     sorted_images = sorted(arr, key = lambda img: img["datetime"] or "" )
 
-    Returns:
-        string של HTML (המפה)
-    """
-    pass
+     # path = [(img["latitude"], img["longitude"]) for img in sorted_images]
+     # folium.Polyline(path).add_to(m)
+
+     return sorted_images
+
+
+def create_map(images_data:list[dict]) -> str: # Returns HTML string
+    gps_images = [img for img in images_data if img["has_gps"]and img["latitude"] is not None and img["longitude"] is not None]
+
+    if not gps_images:
+        return "<h2>No GPS data found</h2>"
+
+    center_lat = sum(img["latitude"] for img in gps_images) / len(gps_images)
+    center_lon = sum(img["longitude"] for img in gps_images) / len(gps_images)
+
+    m = folium.Map(location=[center_lat, center_lon], zoom_start=8)
+
+    for img in gps_images:
+        folium.Marker(
+            location=[img["latitude"], img["longitude"]],
+            popup=f"{img['filename']}<br>{img['datetime']}<br>{img['camera_model']}",
+        ).add_to(m)
+
+
+
+    return m._repr_html_()
+
+# def create_map(images_data):
+#
+#     """
+#     יוצר מפה אינטראקטיבית עם כל המיקומים.
+#
+#     Args:
+#         images_data: רשימת מילונים מ-extract_all
+#
+#     Returns:
+#         string של HTML (המפה)
+#     """
+#     pass
+#
+
+
 
 
 
@@ -44,7 +76,14 @@ if __name__ == "__main__":
          "has_gps": True, "camera_make": "Apple", "camera_model": "iPhone 15 Pro",
          "datetime": "2025-01-13 09:00:00"},
     ]
-    html = create_map(fake_data)
+
+    sorted_data = sort_by_time(extract_all(folder_path='C:\\Users\\User\\Desktop\\saar\\image_intel\\images\\sample_data'))
+    # print(sorted_data) # To check how the sorted data looks like.
+
+    # sorted_data = sort_by_time(fake_data) For testing.
+
+    html = create_map(sorted_data)
     with open("test_map.html", "w", encoding="utf-8") as f:
         f.write(html)
     print("Map saved to test_map.html")
+
