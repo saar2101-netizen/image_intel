@@ -135,7 +135,7 @@ def extract_metadata(image_path) -> dict:
     return exif_dict
 
 
-def extract_all(folder_path) -> list:
+def extract_all(folder_path) -> list[dict]:
     """
     שולף EXIF מכל התמונות בתיקייה.
 
