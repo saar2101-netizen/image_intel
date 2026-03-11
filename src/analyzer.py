@@ -33,7 +33,7 @@ def detect_camera_switches(images_data:list[dict]) -> list[dict]:
 
 def images_data_analyzer(images_data:list[dict]) -> dict:
     """
-    It's a function that creates a report on th mata data.
+    It's a function that creates a report on the mata data.
 
     Args:
         images_data:list[dict]
@@ -66,24 +66,24 @@ def images_data_analyzer(images_data:list[dict]) -> dict:
         "total_images": total_images,
         "images_with_gps": images_with_gps,
         "images_with_datetime": images_with_datetime,
-        " unique_cameras": list(unique_cameras),
+        "unique_cameras": list(unique_cameras),
         "date_range": {
-            "start": sorted_img[0]["datetime"],
-            "end": sorted_img[-1]["datetime"]
+            "start": sorted_img[0]["datetime"] if sorted_img else None, # The condition is for a case where sorted_img is an empty list so we will not get IndexError.
+            "end": sorted_img[-1]["datetime"] if sorted_img else None # The same over here
         },
         "insights": []
     }
 
     # first insights:
     if len(unique_cameras) > 1:
-        report["insights"].append(f'נמצאו{len(unique_cameras)}מכשירים שונים - ייתכן שהסוכן החליף מכשירים')
+        report["insights"].append(f'נמצאו {len(unique_cameras)} מכשירים שונים - ייתכן שהסוכן החליף מכשירים')
 
     # second insights:
     for d in switches:
         date = d["date"][:10]
-        msg = f'ב-{date} הסוכן עבר ממכשיר Samsung ל-iPhone'
+        msg = f'ב-{date} הסוכן עבר ממכשיר {d["from"]} ל-{d["to"]}'
 
-    report["insights"].append(msg)
+        report["insights"].append(msg)
 
     return report
 
