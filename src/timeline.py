@@ -38,6 +38,7 @@ def create_timeline(image_data: list) -> str:
                 <small>{img.get("camera_make", "Unknown Make")} - {img.get("camera_model", "Unknown Model")}</small>
             </div>'''
 
+    html += '\n  <div style="clear: both;"></div>'
     # Close the main wrapper div
     html += '\n</div>'
 

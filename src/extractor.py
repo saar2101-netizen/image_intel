@@ -102,7 +102,7 @@ def extract_metadata(image_path) -> dict:
     try:
         img = Image.open(image_path)
         exif = img._getexif()
-    except AttributeError:
+    except Exception:
         exif = None
 
     if exif is None:
@@ -123,17 +123,19 @@ def extract_metadata(image_path) -> dict:
 
     # תיקון: הוסר print(data) שהיה כאן - הדפיס את כל ה-EXIF הגולמי על כל תמונה
 
-    exif_dict = {
-        "filename": path.name,
-        "datetime": datatime(data),
-        "latitude": latitude(data),
-        "longitude": longitude(data),
-        "camera_make": camera_make(data),
-        "camera_model": camera_model(data),
-        "has_gps": has_gps(data)
-    }
-    return exif_dict
-
+    try:
+        exif_dict = {
+            "filename": path.name,
+            "datetime": datatime(data),
+            "latitude": latitude(data),
+            "longitude": longitude(data),
+            "camera_make": camera_make(data),
+            "camera_model": camera_model(data),
+            "has_gps": has_gps(data)
+        }
+        return exif_dict
+    except Exception:
+        return None
 
 def extract_all(folder_path) -> list[dict]:
     """
@@ -154,8 +156,11 @@ def extract_all(folder_path) -> list[dict]:
 
     for file_path in folder.iterdir():
         if file_path.is_file() and file_path.suffix.lower() in valid_extensions:
-            metadata = extract_metadata(file_path)
-
-            results.append(metadata)
+            try:
+                metadata = extract_metadata(file_path)
+                if metadata is not None:
+                    results.append(metadata)
+            except Exception:
+                continue
 
     return results
