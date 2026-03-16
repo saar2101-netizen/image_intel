@@ -34,7 +34,7 @@ def create_map(images_data: list[dict]) -> str:
     center_lat = sum(img["latitude"] for img in sorted_gps_images) / len(sorted_gps_images)
     center_lon = sum(img["longitude"] for img in sorted_gps_images) / len(sorted_gps_images)
 
-    m = folium.Map(location=[center_lat, center_lon], zoom_start=8)
+    m = folium.Map(location=[center_lat, center_lon], zoom_start=7)
 
     available_colors = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'cadetblue']
     device_colors = {}
