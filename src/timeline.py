@@ -25,21 +25,20 @@ def create_timeline(image_data: list) -> str:
 
     # 4. Iterate over all sorted images
     # The enumerate function gives us both the index (i) and the image itself (img)
+    # 4. Iterate over all sorted images
     for i, img in enumerate(dated_images):
-        # Neat trick from the video: even numbers go on the left, odd numbers on the right
         side = "left" if i % 2 == 0 else "right"
 
-        # Using an f-string to embed our variables into the HTML
-        # Using .get() ensures we don't get a KeyError if a specific data field is missing
         html += f'''
-            <div style="margin:20px 0; text-align:{side}; width:45%; float:{side}; clear:both;">
-                <strong>{img.get("datetime")}</strong><br>
-                {img.get("filename")}<br>
-                <small>{img.get("camera_make", "Unknown Make")} - {img.get("camera_model", "Unknown Model")}</small>
-            </div>'''
+                <div style="margin:20px 0; text-align:{side}; width:45%; float:{side}; clear:both;">
+                    <div style="background-color: #1e293b; padding: 15px; border-radius: 8px; border: 1px solid #334155; display: inline-block; width: 100%; box-sizing: border-box;">
+                        <strong style="color: #38bdf8;">{img.get("datetime")}</strong><br>
+                        <span style="color: #f8fafc;">{img.get("filename")}</span><br>
+                        <small style="color: #94a3b8;">{img.get("camera_make", "Unknown Make")} - {img.get("camera_model", "Unknown Model")}</small>
+                    </div>
+                </div>'''
 
     html += '\n  <div style="clear: both;"></div>'
-    # Close the main wrapper div
     html += '\n</div>'
 
     return html

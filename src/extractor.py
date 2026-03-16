@@ -2,6 +2,10 @@ from PIL import Image
 from PIL.ExifTags import TAGS
 from pathlib import Path
 import os
+from io import BytesIO
+import base64
+
+
 
 """
 extractor.py - שליפת EXIF מתמונות
@@ -11,6 +15,20 @@ extractor.py - שליפת EXIF מתמונות
 
 """
 
+
+def get_thumbnail_base64(image_path, size=(100, 100)):
+    try:
+        with Image.open(image_path) as img:
+            if img.mode != 'RGB':
+                img = img.convert('RGB')
+            img.thumbnail(size)
+            buffer = BytesIO()
+            img.save(buffer, format="JPEG")
+            img_str = base64.b64encode(buffer.getvalue()).decode("utf-8")
+            return f"data:image/jpeg;base64,{img_str}"
+    except Exception as e:
+        print(f"⚠️ שגיאה ביצירת תמונה מוקטנת: {e}")
+        return ""
 
 def dms_to_decimal(dms_tuple, ref) -> float:
     if isinstance(dms_tuple[0], tuple):
@@ -67,7 +85,7 @@ def longitude(data: dict) -> float | None:
     return None
 
 
-def datatime(data: dict) -> str | None:
+def datetime(data: dict) -> str | None:
 
     date_time = data.get("DateTimeOriginal")
     if date_time is None:
@@ -100,8 +118,8 @@ def extract_metadata(image_path) -> dict:
 
     # תיקון: טיפול בתמונה בלי EXIF - בלי זה, exif.items() נופל עם AttributeError
     try:
-        img = Image.open(image_path)
-        exif = img._getexif()
+        with Image.open(image_path) as img:
+            exif = img._getexif()
     except Exception:
         exif = None
 
@@ -113,7 +131,8 @@ def extract_metadata(image_path) -> dict:
             "longitude": None,
             "camera_make": None,
             "camera_model": None,
-            "has_gps": False
+            "has_gps": False,
+            "thumbnail_base64": get_thumbnail_base64(image_path)
         }
 
     data = {}
@@ -126,12 +145,13 @@ def extract_metadata(image_path) -> dict:
     try:
         exif_dict = {
             "filename": path.name,
-            "datetime": datatime(data),
+            "datetime": datetime(data),
             "latitude": latitude(data),
             "longitude": longitude(data),
             "camera_make": camera_make(data),
             "camera_model": camera_model(data),
-            "has_gps": has_gps(data)
+            "has_gps": has_gps(data),
+            "thumbnail_base64": get_thumbnail_base64(image_path)
         }
         return exif_dict
     except Exception:

@@ -52,22 +52,28 @@ def create_map(images_data: list[dict]) -> str:
 
         marker_color = device_colors[device]
 
-        # 1. מכינים את הטקסט בגודל נורמלי
-        # 1. מכינים את הטקסט בגודל אלגנטי יותר (הקטנו מ-18px ל-14px)
+        # בודקים אם יש תמונת Base64 מה-extractor
+        img_src = img.get("thumbnail_base64", "")
+        # === שדרוג ה-CSS של התמונה ===
+        # הוספנו display: block ומירכוז (margin-top/bottom/left/right)
+        thumbnail_html = f'<img src="{img_src}" style="max-width: 100px; max-height: 100px; border-radius: 5px; display: block; margin-top: 10px; margin-bottom: 0; margin-left: auto; margin-right: auto; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">' if img_src else ""
+
+        # === שדרוג ה-HTML של הפופאפ ===
+        # הפכנו את כל ה-div להיות text-align: center
         html_content = f"""
-                <div style="font-family: Arial, sans-serif; font-size: 14px; direction: ltr; margin: 0; padding: 0;">
-                    <b>{img.get('filename', 'Unknown')}</b><br>
+                <div style="font-family: Arial, sans-serif; font-size: 14px; direction: ltr; margin: 0; padding: 0; text-align: center; color: #0f172a;">
+                    <b style="font-size: 16px;">{img.get('filename', 'Unknown')}</b><br>
                     📅 {img.get('datetime', 'Unknown Date')}<br>
-                    📸 {device}
+                    📸 {device}<br>
+                    {thumbnail_html}
                 </div>
                 """
 
-        # 2. הקטנו משמעותית את המסגרת הקשיחה (מ-280x130 ל-200x80)
-        iframe = folium.IFrame(html=html_content, width=200, height=80)
-
-        # מכניסים את ה-IFrame לפופאפ
-        # (שמנו max_width קצת יותר גדול מה-IFrame כדי למנוע שוליים מיותרים)
-        popup = folium.Popup(iframe, max_width=220)
+        # === התיקון הגדול! ===
+        # 1. הסרנו את יצירת ה-IFrame כדי לאפשר גובה אוטומטי
+        # 2. העברנו את html_content ישירות ל-folium.Popup
+        # 3. הגדרנו max_width ל-260 כדי שהטקסט לא ייפרס לרוחב כל המסך.
+        popup = folium.Popup(html_content, max_width=260)
 
         # 3. מוסיפים את המרקר הרגיל (סיכה)
         folium.Marker(
