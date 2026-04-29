@@ -22,6 +22,8 @@ pip install -r requirements.txt
 
 ```bash
 python src/app.py
+python -m flask run # If you are on the path
+python -m flask --debug run # If you are on the path and want debug mood
 ```
 
 גשו ל-`http://localhost:5000` בדפדפן.
